@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+    <changeSet id="1" author="gene">
+        <createTable tableName="cryptocurrency_prices">
+            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="cryptocurrency_prices_id_PK"/>
+            </column>
+            <column name="cryptocurrency" type="VARCHAR(4)">
+                <constraints nullable="false" notNullConstraintName="cryptocurrencies_cryptocurrency_NN"/>
+            </column>
+            <column name="timestamp" type="BIGINT UNSIGNED">
+                <constraints nullable="false" notNullConstraintName="cryptocurrency_prices_timestamp_NN"/>
+            </column>
+            <column name="value_usd" type="DECIMAL(9, 2)">
+                <constraints nullable="false" notNullConstraintName="cryptocurrency_prices_value_usd_NN"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="cryptocurrency_prices"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="2" author="gene">
+        <addUniqueConstraint tableName="cryptocurrency_prices" columnNames="cryptocurrency, timestamp"
+                             constraintName="cryptocurrency_prices_cryptocurrency_timestamp_UN"/>
+        <rollback>
+            <dropUniqueConstraint tableName="cryptocurrency_prices" uniqueColumns="cryptocurrency, timestamp"
+                                  constraintName="cryptocurrency_prices_cryptocurrency_timestamp_UN"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="3" author="gene">
+        <loadData tableName="cryptocurrency_prices" file="prices/BTC_values.csv"/>
+        <loadData tableName="cryptocurrency_prices" file="prices/DOGE_values.csv"/>
+        <loadData tableName="cryptocurrency_prices" file="prices/ETH_values.csv"/>
+        <loadData tableName="cryptocurrency_prices" file="prices/LTC_values.csv"/>
+        <loadData tableName="cryptocurrency_prices" file="prices/XRP_values.csv"/>
+        <rollback>
+            <sql>TRUNCATE TABLE cryptocurrency_prices</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
