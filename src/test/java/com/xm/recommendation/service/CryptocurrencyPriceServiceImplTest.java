@@ -4,6 +4,7 @@ import com.xm.recommendation.persistence.dto.CryptocurrencyWithNormalizedRange;
 import com.xm.recommendation.persistence.repository.CryptocurrencyPriceRepository;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
@@ -15,10 +16,10 @@ import static org.mockito.Mockito.when;
 class CryptocurrencyPriceServiceImplTest {
 
     private final CryptocurrencyPriceRepository cryptocurrencyPriceRepository = mock(CryptocurrencyPriceRepository.class);
+    private final CryptocurrencyPriceService service = new CryptocurrencyPriceServiceImpl(cryptocurrencyPriceRepository);
 
     @Test
     void getCryptocurrenciesSortedByNormalizedRange() {
-        CryptocurrencyPriceService service = new CryptocurrencyPriceServiceImpl(cryptocurrencyPriceRepository);
         when(cryptocurrencyPriceRepository.getCryptocurrenciesWithNormalizedRange())
                 .thenReturn(Flux.just(
                         new CryptocurrencyWithNormalizedRange("BTC", new BigDecimal("0.200000")),
@@ -35,7 +36,6 @@ class CryptocurrencyPriceServiceImplTest {
 
     @Test
     void getCryptocurrenciesSortedByNormalizedRangeWithNoData() {
-        CryptocurrencyPriceService service = new CryptocurrencyPriceServiceImpl(cryptocurrencyPriceRepository);
         when(cryptocurrencyPriceRepository.getCryptocurrenciesWithNormalizedRange())
                 .thenReturn(Flux.empty());
 
@@ -44,5 +44,44 @@ class CryptocurrencyPriceServiceImplTest {
                 .expectComplete()
                 .verify();
     }
+
+    @Test
+    void getOldestPrice() {
+        when(cryptocurrencyPriceRepository.getOldestPriceByCryptocurrency("BTC"))
+                .thenReturn(Mono.just(new BigDecimal("20.00")));
+        StepVerifier.create(service.getOldestPrice("BTC"))
+                .expectNext(new BigDecimal("20.00"))
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void getNewestPrice() {
+        when(cryptocurrencyPriceRepository.getNewestPriceByCryptocurrency("BTC"))
+                .thenReturn(Mono.just(new BigDecimal("30.00")));
+        StepVerifier.create(service.getNewestPrice("BTC"))
+                .expectNext(new BigDecimal("30.00"))
+                .expectComplete()
+                .verify();
+    }
+    @Test
+    void getLowestPrice() {
+        when(cryptocurrencyPriceRepository.getLowestPriceByCryptocurrency("BTC"))
+                .thenReturn(Mono.just(new BigDecimal("40.00")));
+        StepVerifier.create(service.getLowestPrice("BTC"))
+                .expectNext(new BigDecimal("40.00"))
+                .expectComplete()
+                .verify();
+    }
+    @Test
+    void getHighestPrice() {
+        when(cryptocurrencyPriceRepository.getHighestPriceByCryptocurrency("BTC"))
+                .thenReturn(Mono.just(new BigDecimal("50.00")));
+        StepVerifier.create(service.getHighestPrice("BTC"))
+                .expectNext(new BigDecimal("50.00"))
+                .expectComplete()
+                .verify();
+    }
+
 
 }

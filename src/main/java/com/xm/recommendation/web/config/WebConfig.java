@@ -1,6 +1,7 @@
 package com.xm.recommendation.web.config;
 
 import com.xm.recommendation.web.handler.GetCryptocurrenciesRequestHandler;
+import com.xm.recommendation.web.handler.GetCryptocurrencyStatsRequestHandler;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,19 @@ public class WebConfig {
             beanClass = GetCryptocurrenciesRequestHandler.class,
             beanMethod = "getCryptocurrenciesSortedByNormalizedRange",
             produces = "application/json")
-    public RouterFunction<ServerResponse> routes(GetCryptocurrenciesRequestHandler getCryptocurrenciesRequestHandler) {
+    public RouterFunction<ServerResponse> getCryptocurrencies(GetCryptocurrenciesRequestHandler handler) {
         return RouterFunctions.route(RequestPredicates.GET("/cryptocurrencies"),
-                getCryptocurrenciesRequestHandler::getCryptocurrenciesSortedByNormalizedRange);
+                handler::getCryptocurrenciesSortedByNormalizedRange);
+    }
+
+    @Bean
+    @RouterOperation(
+            beanClass = GetCryptocurrencyStatsRequestHandler.class,
+            beanMethod = "getCryptocurrencyStats",
+            produces = "application/json")
+    public RouterFunction<ServerResponse> getCryptocurrencyStats(GetCryptocurrencyStatsRequestHandler handler) {
+        return RouterFunctions.route(RequestPredicates.GET("/cryptocurrencies/{name}/stats"),
+                handler::getCryptocurrencyStats);
     }
 
 }

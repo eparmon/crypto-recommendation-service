@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,6 +24,26 @@ public class CryptocurrencyPriceServiceImpl implements CryptocurrencyPriceServic
                         .sorted(Comparator.comparing(CryptocurrencyWithNormalizedRange::getNormalizedRange).reversed())
                         .map(CryptocurrencyWithNormalizedRange::getCryptocurrency)
                         .toList());
+    }
+
+    @Override
+    public Mono<BigDecimal> getOldestPrice(String cryptocurrency) {
+        return cryptocurrencyPriceRepository.getOldestPriceByCryptocurrency(cryptocurrency);
+    }
+
+    @Override
+    public Mono<BigDecimal> getNewestPrice(String cryptocurrency) {
+        return cryptocurrencyPriceRepository.getNewestPriceByCryptocurrency(cryptocurrency);
+    }
+
+    @Override
+    public Mono<BigDecimal> getLowestPrice(String cryptocurrency) {
+        return cryptocurrencyPriceRepository.getLowestPriceByCryptocurrency(cryptocurrency);
+    }
+
+    @Override
+    public Mono<BigDecimal> getHighestPrice(String cryptocurrency) {
+        return cryptocurrencyPriceRepository.getHighestPriceByCryptocurrency(cryptocurrency);
     }
 
 }

@@ -17,4 +17,10 @@ public class RequestUtils {
                 .bodyValue(body);
     }
 
+    public static Mono<ServerResponse> buildNotFoundResponse() {
+        return ServerResponse
+                .status(HttpStatus.NOT_FOUND)
+                .build();
+    }
+
 }

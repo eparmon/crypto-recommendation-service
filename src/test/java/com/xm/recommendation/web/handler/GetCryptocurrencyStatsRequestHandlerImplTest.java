@@ -2,12 +2,12 @@ package com.xm.recommendation.web.handler;
 
 import com.xm.recommendation.persistence.domain.CryptocurrencyPrice;
 import com.xm.recommendation.persistence.repository.CryptocurrencyPriceRepository;
+import com.xm.recommendation.web.dto.CryptocurrencyStatsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
-class GetCryptocurrenciesRequestHandlerImplTest {
+class GetCryptocurrencyStatsRequestHandlerImplTest {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -29,7 +29,7 @@ class GetCryptocurrenciesRequestHandlerImplTest {
     }
 
     @Test
-    void getCryptocurrenciesSortedByNormalizedRange() {
+    void getCryptocurrencyStats() {
         cryptocurrencyPriceRepository.saveAll(List.of(
                         new CryptocurrencyPrice(null, "BTC", 1L, new BigDecimal(20)),
                         new CryptocurrencyPrice(null, "BTC", 2L, new BigDecimal(30)),
@@ -44,24 +44,20 @@ class GetCryptocurrenciesRequestHandlerImplTest {
                 .block();
 
         webTestClient.get()
-                .uri("/cryptocurrencies")
+                .uri("/cryptocurrencies/BTC/stats")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<String>>() {
-                })
-                .isEqualTo(List.of("ETH", "LTC", "BTC"));
-
+                .expectBody(CryptocurrencyStatsDto.class)
+                .isEqualTo(new CryptocurrencyStatsDto("BTC", new BigDecimal("20.00"), new BigDecimal("25.00"),
+                        new BigDecimal("20.00"), new BigDecimal("30.00")));
     }
 
     @Test
-    void getCryptocurrenciesSortedByNormalizedRangeWithNoData() {
+    void getCryptocurrencyStatsWithNoData() {
         webTestClient.get()
-                .uri("/cryptocurrencies")
+                .uri("/cryptocurrencies/BTC/stats")
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<String>>() {
-                })
-                .isEqualTo(List.of());
+                .expectStatus().isNotFound();
     }
 
 }

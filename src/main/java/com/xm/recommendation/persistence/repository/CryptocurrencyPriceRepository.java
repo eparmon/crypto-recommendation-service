@@ -5,6 +5,9 @@ import com.xm.recommendation.persistence.dto.CryptocurrencyWithNormalizedRange;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
 
 public interface CryptocurrencyPriceRepository extends R2dbcRepository<CryptocurrencyPrice, Long> {
 
@@ -14,5 +17,41 @@ public interface CryptocurrencyPriceRepository extends R2dbcRepository<Cryptocur
             GROUP BY cryptocurrency
             """)
     Flux<CryptocurrencyWithNormalizedRange> getCryptocurrenciesWithNormalizedRange();
+
+    @Query("""
+            SELECT value_usd
+            FROM cryptocurrency_prices
+            WHERE cryptocurrency = :cryptocurrency
+            ORDER BY `timestamp`
+            LIMIT 1
+            """)
+    Mono<BigDecimal> getOldestPriceByCryptocurrency(String cryptocurrency);
+
+    @Query("""
+            SELECT value_usd
+            FROM cryptocurrency_prices
+            WHERE cryptocurrency = :cryptocurrency
+            ORDER BY `timestamp` DESC
+            LIMIT 1
+            """)
+    Mono<BigDecimal> getNewestPriceByCryptocurrency(String cryptocurrency);
+
+    @Query("""
+            SELECT value_usd
+            FROM cryptocurrency_prices
+            WHERE cryptocurrency = :cryptocurrency
+            ORDER BY value_usd
+            LIMIT 1
+            """)
+    Mono<BigDecimal> getLowestPriceByCryptocurrency(String cryptocurrency);
+
+    @Query("""
+            SELECT value_usd
+            FROM cryptocurrency_prices
+            WHERE cryptocurrency = :cryptocurrency
+            ORDER BY value_usd DESC
+            LIMIT 1
+            """)
+    Mono<BigDecimal> getHighestPriceByCryptocurrency(String cryptocurrency);
 
 }
