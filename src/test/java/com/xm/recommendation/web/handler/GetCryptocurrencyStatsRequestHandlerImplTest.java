@@ -40,8 +40,7 @@ class GetCryptocurrencyStatsRequestHandlerImplTest {
                         new CryptocurrencyPrice(null, "ETH", 4L, new BigDecimal(405)),
                         new CryptocurrencyPrice(null, "LTC", 1L, new BigDecimal(2)),
                         new CryptocurrencyPrice(null, "LTC", 2L, new BigDecimal(1))))
-                .collectList()
-                .block();
+                .blockLast();
 
         webTestClient.get()
                 .uri("/cryptocurrencies/BTC/stats")

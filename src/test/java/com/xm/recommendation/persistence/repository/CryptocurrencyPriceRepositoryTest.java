@@ -42,6 +42,27 @@ class CryptocurrencyPriceRepositoryTest {
     }
 
     @Test
+    void getCryptocurrencyWithHighestNormalizedRangeBetweenTimestamps() {
+        loadTestData();
+
+        StepVerifier.create(cryptocurrencyPriceRepository.getCryptocurrencyWithHighestNormalizedRangeBetweenTimestamps(
+                1641000000000L, 1641200000000L))
+                .expectNext("ETH")
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void getCryptocurrencyWithHighestNormalizedRangeBetweenTimestampsWithNoData() {
+        loadTestData();
+
+        StepVerifier.create(cryptocurrencyPriceRepository.getCryptocurrencyWithHighestNormalizedRangeBetweenTimestamps(
+                1643000000000L, 1641400000000L))
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
     void getOldestPriceByCryptocurrency() {
         loadTestData();
 
@@ -83,17 +104,18 @@ class CryptocurrencyPriceRepositoryTest {
 
     private void loadTestData() {
         cryptocurrencyPriceRepository.saveAll(List.of(
-                        new CryptocurrencyPrice(null, "BTC", 1L, new BigDecimal(20)),
-                        new CryptocurrencyPrice(null, "BTC", 2L, new BigDecimal(30)),
-                        new CryptocurrencyPrice(null, "BTC", 3L, new BigDecimal(25)),
-                        new CryptocurrencyPrice(null, "ETH", 1L, new BigDecimal(200)),
-                        new CryptocurrencyPrice(null, "ETH", 2L, new BigDecimal(30)),
-                        new CryptocurrencyPrice(null, "ETH", 3L, new BigDecimal(100)),
-                        new CryptocurrencyPrice(null, "ETH", 4L, new BigDecimal(405)),
-                        new CryptocurrencyPrice(null, "LTC", 1L, new BigDecimal(2)),
-                        new CryptocurrencyPrice(null, "LTC", 2L, new BigDecimal(1))))
-                .collectList()
-                .block();
+                        // 01.01.2022
+                        new CryptocurrencyPrice(null, "BTC", 1641000000000L, new BigDecimal(20)),
+                        new CryptocurrencyPrice(null, "ETH", 1641000000000L, new BigDecimal(200)),
+                        new CryptocurrencyPrice(null, "LTC", 1641000000000L, new BigDecimal(2)),
+                        new CryptocurrencyPrice(null, "BTC", 1641000010000L, new BigDecimal(30)),
+                        new CryptocurrencyPrice(null, "ETH", 1641000010000L, new BigDecimal(30)),
+                        new CryptocurrencyPrice(null, "LTC", 1641000010000L, new BigDecimal(1)),
+                        // 03.01.2022
+                        new CryptocurrencyPrice(null, "BTC", 1641200000000L, new BigDecimal(25)),
+                        new CryptocurrencyPrice(null, "ETH", 1641200000000L, new BigDecimal(100)),
+                        new CryptocurrencyPrice(null, "ETH", 1641200010000L, new BigDecimal(405))))
+                .blockLast();
     }
 
 }

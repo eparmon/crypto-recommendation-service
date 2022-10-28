@@ -8,6 +8,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
@@ -41,6 +43,35 @@ class CryptocurrencyPriceServiceImplTest {
 
         StepVerifier.create(service.getCryptocurrenciesSortedByNormalizedRange())
                 .expectNext(List.of())
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void getCryptocurrencyWithHighestNormalizedRange() {
+        LocalDate date = LocalDate.of(2022, 1, 1);
+        long timestampFrom = date.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond() * 1000;
+        LocalDate nextDate = LocalDate.of(2022, 1, 2);
+        long timestampTo = nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond() * 1000;
+        when(cryptocurrencyPriceRepository.getCryptocurrencyWithHighestNormalizedRangeBetweenTimestamps(
+                timestampFrom, timestampTo)).thenReturn(Mono.just("BTC"));
+
+        StepVerifier.create(service.getCryptocurrencyWithHighestNormalizedRange(date))
+                .expectNext("BTC")
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void getCryptocurrencyWithHighestNormalizedRangeWithNoData() {
+        LocalDate date = LocalDate.of(2022, 1, 1);
+        long timestampFrom = date.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond() * 1000;
+        LocalDate nextDate = LocalDate.of(2022, 1, 2);
+        long timestampTo = nextDate.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond() * 1000;
+        when(cryptocurrencyPriceRepository.getCryptocurrencyWithHighestNormalizedRangeBetweenTimestamps(
+                timestampFrom, timestampTo)).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.getCryptocurrencyWithHighestNormalizedRange(date))
                 .expectComplete()
                 .verify();
     }

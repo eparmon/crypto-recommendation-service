@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -34,7 +35,7 @@ public class GetCryptocurrenciesRequestHandlerImpl implements GetCryptocurrencie
                             """))))
     public Mono<ServerResponse> getCryptocurrenciesSortedByNormalizedRange(ServerRequest serverRequest) {
         return cryptocurrencyPriceService.getCryptocurrenciesSortedByNormalizedRange()
-                .flatMap(RequestUtils::buildOkResponse);
+                .flatMap(body -> RequestUtils.buildOkResponse(body, MediaType.APPLICATION_JSON));
     }
 
 }

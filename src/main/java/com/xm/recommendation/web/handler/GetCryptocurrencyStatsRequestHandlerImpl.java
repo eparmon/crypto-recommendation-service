@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -70,7 +71,7 @@ public class GetCryptocurrencyStatsRequestHandlerImpl implements GetCryptocurren
                             cryptoStatsDto.setNewestPrice(price);
                             return cryptoStatsDto;
                         }))
-                .flatMap(RequestUtils::buildOkResponse)
+                .flatMap(body -> RequestUtils.buildOkResponse(body, MediaType.APPLICATION_JSON))
                 .switchIfEmpty(RequestUtils.buildNotFoundResponse());
     }
 

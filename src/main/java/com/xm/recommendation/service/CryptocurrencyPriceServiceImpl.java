@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,6 +26,14 @@ public class CryptocurrencyPriceServiceImpl implements CryptocurrencyPriceServic
                         .sorted(Comparator.comparing(CryptocurrencyWithNormalizedRange::getNormalizedRange).reversed())
                         .map(CryptocurrencyWithNormalizedRange::getCryptocurrency)
                         .toList());
+    }
+
+    @Override
+    public Mono<String> getCryptocurrencyWithHighestNormalizedRange(LocalDate localDate) {
+        long timestampFrom = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond() * 1000;
+        long timestampTo = localDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+                .getEpochSecond() * 1000;
+        return cryptocurrencyPriceRepository.getCryptocurrencyWithHighestNormalizedRangeBetweenTimestamps(timestampFrom, timestampTo);
     }
 
     @Override
