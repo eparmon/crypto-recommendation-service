@@ -7,4 +7,7 @@ spring.liquibase.user=USERNAME
 spring.liquibase.password=PASSWORD
 spring.liquibase.change-log=db/changelog/db.changelog-master.xml
 
+app.rate-limit.requests-allowed-per-period=100
+app.rate-limit.period-millis=1000
+
 spring.main.lazy-initialization=true
