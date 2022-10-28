@@ -2,16 +2,20 @@ package com.xm.recommendation.web.config;
 
 import com.xm.recommendation.web.handler.GetCryptocurrenciesRequestHandler;
 import com.xm.recommendation.web.handler.GetCryptocurrencyStatsRequestHandler;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.RequestPredicates;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.server.*;
 
-@Component
+@Configuration
+@RequiredArgsConstructor
 public class WebConfig {
+
+    private final RateLimiterRegistry rateLimiterRegistry;
 
     @Bean
     @RouterOperation(
@@ -20,7 +24,8 @@ public class WebConfig {
             produces = "application/json")
     public RouterFunction<ServerResponse> getCryptocurrencies(GetCryptocurrenciesRequestHandler handler) {
         return RouterFunctions.route(RequestPredicates.GET("/cryptocurrencies"),
-                handler::getCryptocurrenciesSortedByNormalizedRange);
+                serverRequest -> handler.getCryptocurrenciesSortedByNormalizedRange(serverRequest)
+                        .transformDeferred(RateLimiterOperator.of(getRateLimiter(serverRequest))));
     }
 
     @Bean
@@ -30,7 +35,14 @@ public class WebConfig {
             produces = "application/json")
     public RouterFunction<ServerResponse> getCryptocurrencyStats(GetCryptocurrencyStatsRequestHandler handler) {
         return RouterFunctions.route(RequestPredicates.GET("/cryptocurrencies/{name}/stats"),
-                handler::getCryptocurrencyStats);
+                serverRequest -> handler.getCryptocurrencyStats(serverRequest)
+                        .transformDeferred(RateLimiterOperator.of(getRateLimiter(serverRequest))));
+    }
+
+    private RateLimiter getRateLimiter(ServerRequest serverRequest) {
+        return serverRequest.remoteAddress()
+                .map(remoteAddress -> rateLimiterRegistry.rateLimiter(remoteAddress.getAddress().getHostAddress()))
+                .orElseGet(() -> rateLimiterRegistry.rateLimiter("default"));
     }
 
 }

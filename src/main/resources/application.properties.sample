@@ -6,3 +6,6 @@ spring.liquibase.url=jdbc:mariadb://localhost:3306/DATABASE_NAME
 spring.liquibase.user=USERNAME
 spring.liquibase.password=PASSWORD
 spring.liquibase.change-log=db/changelog/db.changelog-master.xml
+
+app.rate-limit.requests-allowed-per-period=2
+app.rate-limit.period-millis=1000
