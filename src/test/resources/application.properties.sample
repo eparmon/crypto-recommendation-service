@@ -1,0 +1,10 @@
+spring.r2dbc.url=r2dbc:mariadb://localhost:3306/DATABASE_NAME
+spring.r2dbc.username=USERNAME
+spring.r2dbc.password=PASSWORD
+
+spring.liquibase.url=jdbc:mariadb://localhost:3306/DATABASE_NAME
+spring.liquibase.user=USERNAME
+spring.liquibase.password=PASSWORD
+spring.liquibase.change-log=db/changelog/db.changelog-master.xml
+
+spring.main.lazy-initialization=true
