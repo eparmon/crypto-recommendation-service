@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,8 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         description = "A service that recommends a cryptocurrency to invest in",
         contact = @Contact(name = "Gene Parmon", url = "https://t.me/eparmon", email = "eparmon@tuta.io"),
         license = @License(name = "Unlicense", url = "https://unlicense.org/"),
-        version = "1.0.0"),
-        tags = @Tag(name = "Crypto")
+        version = "1.0.0")
 )
 public class RecommendationApplication {
 
